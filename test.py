@@ -44,6 +44,9 @@ class TestFiles(unittest.TestCase):
                     os.remove(decls_file.name)
                     os.remove(dtrace_file.name)
 
+                    # Ensure Daikon did not exit with error
+                    self.assertEqual(out.returncode, 0)
+
                     # Get the lines of the output from the delimiter ===
                     # skipping the next line which has the program point
                     # and excluding the last two lines which are info
