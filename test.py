@@ -25,6 +25,9 @@ class TestFiles(unittest.TestCase):
                     jar_path = os.path.abspath(
                         os.path.join(os.path.dirname(__file__), "daikon.jar")
                     )
+                    config_path = os.path.abspath(
+                        os.path.join(os.path.dirname(__file__), "tests", "settings.txt")
+                    )
                     invs_out = tempfile.NamedTemporaryFile(mode="w")
                     out = subprocess.run(
                         [
@@ -32,6 +35,8 @@ class TestFiles(unittest.TestCase):
                             "-cp",
                             jar_path,
                             "daikon.Daikon",
+                            "--config",
+                            config_path,
                             "-o",
                             invs_out.name,
                             decls_file.name,
