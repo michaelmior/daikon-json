@@ -1,4 +1,5 @@
 # Daikon JSON
+[![CI](https://github.com/michaelmior/daikon-json/actions/workflows/ci.yml/badge.svg)](https://github.com/michaelmior/daikon-json/actions/workflows/ci.yml)
 
 This repository implements a JSON front end for the [Daikon](https://plse.cs.washington.edu/daikon/) invariant detector.
 It allows the detection of invariants across a collection of JSON documents in [JSON Lines](https://jsonlines.org/) format.
