@@ -4,7 +4,8 @@ import json
 import sys
 
 TYPES = ["java.lang.String", "int", "double", "Map"]
-ESCAPE = str.maketrans({'"':  r"\"", "\n":  r"\n", "\r":  r"\r"})
+ESCAPE = str.maketrans({'"': r"\"", "\n": r"\n", "\r": r"\r"})
+
 
 def var_type(value):
     if isinstance(value, str):
@@ -16,6 +17,7 @@ def var_type(value):
     elif isinstance(value, dict):
         return "Map"
 
+
 def value_str(value):
     if isinstance(value, dict):
         return "nonsensical"
@@ -24,32 +26,20 @@ def value_str(value):
     else:
         return str(value)
 
+
 def process_obj(obj, path="__ROOT__", key=None):
     values = []
     if isinstance(obj, dict):
         values.append((path, key, {}))
-        for (k, v) in obj.items():
+        for k, v in obj.items():
             values.extend(process_obj(v, path, k))
     else:
         values.append((path, key, obj))
 
     return values
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('input')
-    parser.add_argument('decls_out')
-    parser.add_argument('dtrace_out')
-    args = parser.parse_args()
 
-    if args.input == '-':
-        infile = sys.stdin
-    else:
-        infile = open(args.input)
-
-    decls_file = open(args.decls_out, 'w')
-    dtrace_file = open(args.dtrace_out, 'w')
-
+def run_daikon(infile, decls_file, dtrace_file):
     decls_file.write("decl-version 2.0\n")
     decls_file.write("input-language json\n")
 
@@ -61,7 +51,7 @@ def main():
     decls_file.write("ppt program.point:::POINT\n")
     decls_file.write("ppt-type point\n")
 
-    for (path, key, value) in values[0]:
+    for path, key, value in values[0]:
         if key is None:
             decls_file.write("variable " + path + "\n")
             decls_file.write("  var-kind variable\n")
@@ -77,10 +67,11 @@ def main():
             decls_file.write("  rep-type hashcode\n")
         else:
             decls_file.write("  rep-type " + value_type + "\n")
+    decls_file.close()
 
     for value_group in values:
         dtrace_file.write("program.point:::POINT\n")
-        for (path, key, value) in value_group:
+        for path, key, value in value_group:
             if key is None:
                 dtrace_file.write(path + "\n")
             else:
@@ -89,6 +80,31 @@ def main():
             dtrace_file.write("1\n")
 
         dtrace_file.write("\n")
+    dtrace_file.close()
 
-if __name__ == '__main__':
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("input")
+    parser.add_argument("decls_out")
+    parser.add_argument("dtrace_out")
+    args = parser.parse_args()
+
+    if args.input == "-":
+        infile = sys.stdin
+    else:
+        infile = open(args.input)
+
+    decls_file = open(decls_out, "w")
+    dtrace_file = open(dtrace_out, "w")
+
+    run_daikon(infile, decls_file, dtrace_file)
+
+    decls_file.close()
+    dtrace_file.close()
+
+    infile.close()
+
+
+if __name__ == "__main__":
     main()
