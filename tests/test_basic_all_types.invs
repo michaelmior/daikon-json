@@ -1,0 +1,5 @@
+__ROOT__.foo == "bar"
+__ROOT__.baz == 3
+__ROOT__.quux == 1.4
+__ROOT__.corge == true
+__ROOT__.garply == null

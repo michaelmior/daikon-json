@@ -3,19 +3,23 @@ import collections
 import json
 import sys
 
-TYPES = ["java.lang.String", "int", "double", "Map"]
+TYPES = ["java.lang.String", "int", "double", "Map", "None", "boolean"]
 ESCAPE = str.maketrans({'"': r"\"", "\n": r"\n", "\r": r"\r"})
 
 
 def var_type(value):
     if isinstance(value, str):
         return "java.lang.String"
+    elif isinstance(value, bool):
+        return "boolean"
     elif isinstance(value, int):
         return "int"
     elif isinstance(value, float):
         return "double"
     elif isinstance(value, dict):
         return "Map"
+    elif value is None:
+        return "None"
 
 
 def value_str(value):
@@ -23,6 +27,10 @@ def value_str(value):
         return "nonsensical"
     elif isinstance(value, str):
         return '"' + value.translate(ESCAPE) + '"'
+    elif isinstance(value, bool):
+        return "true" if value else "false"
+    elif value is None:
+        return "null"
     else:
         return str(value)
 
@@ -63,7 +71,7 @@ def run_daikon(infile, decls_file, dtrace_file):
         value_type = var_type(value)
         decls_file.write("  comparability " + str(TYPES.index(value_type)) + "\n")
         decls_file.write("  dec-type " + value_type + "\n")
-        if value_type == "Map":
+        if value_type in ["Map", "None"]:
             decls_file.write("  rep-type hashcode\n")
         else:
             decls_file.write("  rep-type " + value_type + "\n")
