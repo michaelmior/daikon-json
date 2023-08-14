@@ -1,0 +1,5 @@
+__ROOT__.foo[] == [1]
+__ROOT__.foo[] elements == 1
+size(__ROOT__.foo[]) == 1
+__ROOT__.foo[] elements == size(__ROOT__.foo[])
+size(__ROOT__.foo[]) in __ROOT__.foo[]

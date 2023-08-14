@@ -18,6 +18,8 @@ def var_type(value):
         return "double"
     elif isinstance(value, dict):
         return "Map"
+    elif isinstance(value, list):
+        return var_type(value[0]) + "[]"
     elif value is None:
         return "None"
 
@@ -41,6 +43,8 @@ def process_obj(obj, path="__ROOT__", key=None):
         values.append((path, key, {}))
         for k in sorted(obj.keys()):
             values.extend(process_obj(obj[k], path, k))
+    elif isinstance(obj, list):
+        values.append((path + "." + key + "[]", None, obj))
     else:
         values.append((path, key, obj))
 
@@ -61,15 +65,25 @@ def run_daikon(infile, decls_file, dtrace_file):
 
     for path, key, value in values[0]:
         if key is None:
-            decls_file.write("variable " + path + "\n")
-            decls_file.write("  var-kind variable\n")
+            if path.endswith("[]"):
+                decls_file.write("variable " + path + "\n")
+                decls_file.write("  var-kind array\n")
+                enclosing_path = ".".join(path[:-2].split(".")[:-1])
+                decls_file.write("  enclosing-var " + enclosing_path + "\n")
+            else:
+                decls_file.write("variable " + path + "\n")
+                decls_file.write("  var-kind variable\n")
         else:
             decls_file.write("variable " + path + "." + key + "\n")
             decls_file.write("  var-kind field " + key + "\n")
             decls_file.write("  enclosing-var " + path + "\n")
 
         value_type = var_type(value)
-        decls_file.write("  comparability " + str(TYPES.index(value_type)) + "\n")
+        if value_type.endswith("[]"):
+            comp_index = len(TYPES) + TYPES.index(value_type[:-2])
+        else:
+            comp_index = TYPES.index(value_type)
+        decls_file.write("  comparability " + str(comp_index) + "\n")
         decls_file.write("  dec-type " + value_type + "\n")
         if value_type in ["Map", "None"]:
             decls_file.write("  rep-type hashcode\n")
