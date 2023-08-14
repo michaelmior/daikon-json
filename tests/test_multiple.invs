@@ -1,1 +1,1 @@
-__ROOT__.foo < __ROOT__.bar
+__ROOT__.bar > __ROOT__.foo

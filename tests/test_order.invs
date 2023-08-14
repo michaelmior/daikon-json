@@ -1,0 +1,2 @@
+__ROOT__.foo == "bar"
+__ROOT__.baz == "quux"

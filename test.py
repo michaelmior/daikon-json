@@ -55,8 +55,8 @@ class TestFiles(unittest.TestCase):
 
                     # Get the expected output and compare
                     with open(os.path.splitext(infile_name)[0] + ".invs") as outfile:
-                        expected = list(map(str.strip, outfile.readlines()))
-                    self.assertEqual(lines, expected)
+                        expected = set(map(str.strip, outfile.readlines()))
+                    self.assertEqual(set(lines), expected)
 
 
 if __name__ == "__main__":

@@ -39,8 +39,8 @@ def process_obj(obj, path="__ROOT__", key=None):
     values = []
     if isinstance(obj, dict):
         values.append((path, key, {}))
-        for k, v in obj.items():
-            values.extend(process_obj(v, path, k))
+        for k in sorted(obj.keys()):
+            values.extend(process_obj(obj[k], path, k))
     else:
         values.append((path, key, obj))
 
