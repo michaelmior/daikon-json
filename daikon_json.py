@@ -42,6 +42,8 @@ def process_obj(obj, path="__ROOT__", key=None):
     if isinstance(obj, dict):
         values.append((path, key, {}))
         for k in sorted(obj.keys()):
+            if key is not None:
+                path += "." + key
             values.extend(process_obj(obj[k], path, k))
     elif isinstance(obj, list):
         values.append((path + "." + key + "[]", None, obj))
