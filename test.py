@@ -13,13 +13,10 @@ class TestFiles(unittest.TestCase):
             with self.subTest(input=infile_name):
                 with open(infile_name) as infile:
                     # Build the Daikon input from the JSON
-                    decls_file = tempfile.NamedTemporaryFile(
-                        suffix=".decls", mode="w", delete=False
-                    )
                     dtrace_file = tempfile.NamedTemporaryFile(
                         suffix=".dtrace", mode="w", delete=False
                     )
-                    daikon_json.run_daikon(infile, decls_file, dtrace_file)
+                    daikon_json.run_daikon(infile, dtrace_file)
 
                     # Run Daikon on the produced declarations and trace
                     jar_path = os.path.abspath(
@@ -39,14 +36,12 @@ class TestFiles(unittest.TestCase):
                             config_path,
                             "-o",
                             invs_out.name,
-                            decls_file.name,
                             dtrace_file.name,
                         ],
                         capture_output=True,
                     )
 
                     # Remove the temporary files
-                    os.remove(decls_file.name)
                     os.remove(dtrace_file.name)
 
                     # Ensure Daikon did not exit with error

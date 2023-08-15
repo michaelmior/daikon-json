@@ -53,46 +53,46 @@ def process_obj(obj, path="__ROOT__", key=None):
     return values
 
 
-def run_daikon(infile, decls_file, dtrace_file):
-    decls_file.write("decl-version 2.0\n")
-    decls_file.write("input-language json\n")
+def run_daikon(infile, dtrace_file):
+    dtrace_file.write("decl-version 2.0\n")
+    dtrace_file.write("input-language json\n")
 
     values = []
     for line in infile:
         obj = json.loads(line)
         values.append(process_obj(obj))
 
-    decls_file.write("ppt program.point:::POINT\n")
-    decls_file.write("ppt-type point\n")
+    dtrace_file.write("ppt program.point:::POINT\n")
+    dtrace_file.write("ppt-type point\n")
 
     for path, key, value in values[0]:
         if key is None:
             if path.endswith("[]"):
-                decls_file.write("variable " + path + "\n")
-                decls_file.write("  var-kind array\n")
+                dtrace_file.write("variable " + path + "\n")
+                dtrace_file.write("  var-kind array\n")
                 enclosing_path = ".".join(path[:-2].split(".")[:-1])
-                decls_file.write("  enclosing-var " + enclosing_path + "\n")
+                dtrace_file.write("  enclosing-var " + enclosing_path + "\n")
             else:
-                decls_file.write("variable " + path + "\n")
-                decls_file.write("  var-kind variable\n")
+                dtrace_file.write("variable " + path + "\n")
+                dtrace_file.write("  var-kind variable\n")
         else:
-            decls_file.write("variable " + path + "." + key + "\n")
-            decls_file.write("  var-kind field " + key + "\n")
-            decls_file.write("  enclosing-var " + path + "\n")
+            dtrace_file.write("variable " + path + "." + key + "\n")
+            dtrace_file.write("  var-kind field " + key + "\n")
+            dtrace_file.write("  enclosing-var " + path + "\n")
 
         value_type = var_type(value)
         if value_type.endswith("[]"):
             comp_index = len(TYPES) + TYPES.index(value_type[:-2])
         else:
             comp_index = TYPES.index(value_type)
-        decls_file.write("  comparability " + str(comp_index) + "\n")
-        decls_file.write("  dec-type " + value_type + "\n")
+        dtrace_file.write("  comparability " + str(comp_index) + "\n")
+        dtrace_file.write("  dec-type " + value_type + "\n")
         if value_type in ["Map", "None"]:
-            decls_file.write("  rep-type hashcode\n")
+            dtrace_file.write("  rep-type hashcode\n")
         else:
-            decls_file.write("  rep-type " + value_type + "\n")
-    decls_file.close()
+            dtrace_file.write("  rep-type " + value_type + "\n")
 
+    dtrace_file.write("\n")
     for value_group in values:
         dtrace_file.write("program.point:::POINT\n")
         for path, key, value in value_group:
@@ -110,7 +110,6 @@ def run_daikon(infile, decls_file, dtrace_file):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("input")
-    parser.add_argument("decls_out")
     parser.add_argument("dtrace_out")
     args = parser.parse_args()
 
@@ -119,12 +118,10 @@ def main():
     else:
         infile = open(args.input)
 
-    decls_file = open(decls_out, "w")
     dtrace_file = open(dtrace_out, "w")
 
-    run_daikon(infile, decls_file, dtrace_file)
+    run_daikon(infile, dtrace_file)
 
-    decls_file.close()
     dtrace_file.close()
 
     infile.close()
