@@ -118,7 +118,7 @@ def main():
     else:
         infile = open(args.input)
 
-    dtrace_file = open(dtrace_out, "w")
+    dtrace_file = open(args.dtrace_out, "w")
 
     run_daikon(infile, dtrace_file)
 
